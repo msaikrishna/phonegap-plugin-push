@@ -204,11 +204,6 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
         Log.d(LOG_TAG, "message =[" + message + "]");
         Log.d(LOG_TAG, "title =[" + title + "]");
         Log.d(LOG_TAG, "contentAvailable =[" + contentAvailable + "]");
-        Log.d(LOG_TAG, "badgeCount =[" + badgeCount + "]");
-
-        if (badgeCount != null) {
-            PushPlugin.setApplicationIconBadgeNumber(context, Integer.parseInt(badgeCount));
-        }
 
         if ((message != null && message.length() != 0) ||
                 (title != null && title.length() != 0)) {
@@ -325,7 +320,7 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
         /*
          * Notification count
          */
-        setNotificationCount(extras, mBuilder);
+        setNotificationCount(context, extras, mBuilder);
 
         /*
          * Notification add actions
@@ -382,13 +377,24 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
         }
     }
 
-    private void setNotificationCount(Bundle extras, NotificationCompat.Builder mBuilder) {
+    private void setNotificationCount(Context context, Bundle extras, NotificationCompat.Builder mBuilder) {
         String msgcnt = extras.getString(MSGCNT);
         if (msgcnt == null) {
             msgcnt = extras.getString(BADGE);
+            if (msgcnt == null) {
+                msgcnt = extras.getString(COUNT);
+            }
         }
+
         if (msgcnt != null) {
-            mBuilder.setNumber(Integer.parseInt(msgcnt));
+            Log.d(LOG_TAG, "count =[" + msgcnt + "]");
+            try {
+                int count = Integer.parseInt(msgcnt);
+                PushPlugin.setApplicationIconBadgeNumber(context, count);
+                mBuilder.setNumber(count);
+            } catch(NumberFormatException e) {
+                Log.d(LOG_TAG, "Unable to set badge, invalid count " + msgcnt);
+            }
         }
     }
 
