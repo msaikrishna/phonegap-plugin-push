@@ -18,7 +18,9 @@ var createNotificationJSON = function (e) {
             if (texts.length > 1) {
                 result.title = texts[0].innerText;
                 result.message = texts[1].innerText;
-                result.page = texts[2].innerText;
+                if (texts.length > 2) {
+                    result.page = texts[2].innerText;
+                }
             }
             else if(texts.length === 1) {
                 result.message = texts[0].innerText;
